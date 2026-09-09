@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo.png" alt="Open AIoT" width="120">
+</p>
+
 # Open AIoT MCP Server
 
 **AI Agent 与物联网设备之间的 MCP 协议适配器 —— Open AIoT 的 L1 协议绑定层参考实现。**
