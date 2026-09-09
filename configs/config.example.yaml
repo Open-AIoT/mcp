@@ -1,0 +1,16 @@
+# 监听地址（MCP 端点为 http://<listen>/mcp）
+listen: "127.0.0.1:8081"
+
+backend:
+  # 上游后端地址：任何符合契约的实现（演示用 examples/demo-backend）
+  base_url: "http://127.0.0.1:8080"
+  # 适配器自持的上游 Bearer 凭据（可信网关模式：不透传客户端 token）
+  token: "demo-backend-token"
+  # 以下为缺省值，可不写：
+  # manifest_path: "/v1/tools/openai.json"  # 既有契约端点名（规范定稿后将迁移中立命名）
+  # invoke_path: "/v1/tools/invoke"
+
+# 允许接入的 MCP 客户端凭据（一期静态列表；客户端用 Authorization: Bearer <token> 连接）
+clients:
+  - name: "demo-client"
+    token: "demo-client-token"
