@@ -28,7 +28,7 @@ func stub(t *testing.T, manifestBody string, invokeStatus int, invokeBody string
 		}
 	}))
 	t.Cleanup(srv.Close)
-	return NewClient(srv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", "upstream-token", srv.Client()), srv
+	return NewClient(srv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", Credential{Kind: "bearer", Token: "upstream-token"}, srv.Client()), srv
 }
 
 func TestFetchManifest(t *testing.T) {
@@ -82,7 +82,7 @@ func TestInvokeProblem(t *testing.T) {
 
 func TestInvokeUnreachable(t *testing.T) {
 	// 连不上的后端 → 传输层 err（由适配器合成 503 problem）。
-	c := NewClient("http://127.0.0.1:1", "/m.json", "/i", "tok", nil)
+	c := NewClient("http://127.0.0.1:1", "/m.json", "/i", Credential{Kind: "bearer", Token: "tok"}, nil)
 	_, _, err := c.Invoke(context.Background(), "x", nil)
 	if err == nil {
 		t.Fatal("expecting transport error")

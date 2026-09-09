@@ -20,7 +20,13 @@ type Config struct {
 // Backend 上游后端契约配置。
 type Backend struct {
 	BaseURL string `yaml:"base_url"` // 如 "http://127.0.0.1:8080"，不带尾斜杠
-	Token   string `yaml:"token"`    // 适配器自持的上游 Bearer 凭据（可信网关模式：不透传客户端 token）
+	// AuthType 上游凭据类型（可信网关模式：不透传客户端 token）：
+	//   - bearer：静态 token，后端侧只读语义——适用只读演示/监控场景；
+	//   - hmac：app_key + HMAC-SHA256 每请求签名，后端侧全权——控制设备需要它。
+	AuthType  string `yaml:"auth_type"`
+	Token     string `yaml:"token"`      // bearer 凭据
+	AppKey    string `yaml:"app_key"`    // hmac 凭据
+	AppSecret string `yaml:"app_secret"` // hmac 凭据（仅存本地配置）
 	// ManifestPath 工具清单端点。现值为既有契约端点名（含历史命名的 .json 文件名；
 	// 规范定稿后将迁移为中立命名，届时改这里即可，代码不变）。
 	ManifestPath string `yaml:"manifest_path"`
@@ -57,8 +63,18 @@ func Load(path string) (*Config, error) {
 	if c.Backend.BaseURL == "" {
 		return nil, fmt.Errorf("config: backend.base_url is required")
 	}
-	if c.Backend.Token == "" {
-		return nil, fmt.Errorf("config: backend.token is required (trusted-gateway: the adapter holds its own upstream credential)")
+	switch strings.ToLower(c.Backend.AuthType) {
+	case "", "bearer":
+		c.Backend.AuthType = "bearer" // 缺省 bearer（只读场景的最小权限缺省）
+		if c.Backend.Token == "" {
+			return nil, fmt.Errorf("config: backend.token is required for auth_type bearer")
+		}
+	case "hmac":
+		if c.Backend.AppKey == "" || c.Backend.AppSecret == "" {
+			return nil, fmt.Errorf("config: backend.app_key and backend.app_secret are required for auth_type hmac")
+		}
+	default:
+		return nil, fmt.Errorf("config: backend.auth_type must be bearer or hmac, got %q", c.Backend.AuthType)
 	}
 	if c.Backend.ManifestPath == "" {
 		c.Backend.ManifestPath = DefaultManifestPath

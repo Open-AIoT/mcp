@@ -65,6 +65,7 @@ MCP 客户端 ──/mcp──▶ openaiot-mcp（本仓）──REST──▶ �
 ```
 
 - **可信网关模式**：适配器校验自己的客户端 token（配置静态列表），用自持的上游凭据调后端；客户端 token 不透传。
+- **上游凭据两级**（`backend.auth_type`，与后端凭据体系对应）：`bearer` 为只读语义，适用只读演示/监控场景（演示后端即此模式）；`hmac` 为全权语义（app_key + HMAC-SHA256 每请求签名：`X-App-Key`/`X-Timestamp`/`X-Nonce`/`X-Signature`，签名公式与后端验签逐字段一致），**控制设备（control 类工具）需要它**。
 - **无状态子集**：单端点 `POST /mcp`，纯 `application/json` 响应（无 SSE/session/批量请求），请求体上限 1 MiB。
 - **错误两级制**：协议错误走 JSON-RPC error；后端业务错误（problem+json）包装为 `isError:true` 的正常结果回给模型。
 - **审计**：每次 `tools/call` 落一行 JSON 结构化日志（时间、工具名、客户端 token 指纹 sha256、状态）。

@@ -4,8 +4,13 @@ listen: "127.0.0.1:8081"
 backend:
   # 上游后端地址：任何符合契约的实现（演示用 examples/demo-backend）
   base_url: "http://127.0.0.1:8080"
-  # 适配器自持的上游 Bearer 凭据（可信网关模式：不透传客户端 token）
+  # 上游凭据类型：bearer（只读语义，适用只读演示/监控）或 hmac（全权语义，控制设备需要它）
+  auth_type: "bearer"
+  # bearer 凭据：适配器自持的上游 token（可信网关模式：不透传客户端 token）
   token: "demo-backend-token"
+  # hmac 凭据（auth_type: hmac 时必填；签名公式见后端接入协议文档）：
+  # app_key: "app-demo"
+  # app_secret: "change-me"
   # 以下为缺省值，可不写：
   # manifest_path: "/v1/tools/openai.json"  # 既有契约端点名（规范定稿后将迁移中立命名）
   # invoke_path: "/v1/tools/invoke"

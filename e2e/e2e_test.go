@@ -41,7 +41,7 @@ func stack(t *testing.T) *mcp.ClientSession {
 	t.Cleanup(demoSrv.Close)
 
 	// 适配器
-	be := backend.NewClient(demoSrv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", upstreamToken, demoSrv.Client())
+	be := backend.NewClient(demoSrv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", backend.Credential{Kind: "bearer", Token: upstreamToken}, demoSrv.Client())
 	tools, err := be.FetchManifest(context.Background())
 	if err != nil {
 		t.Fatalf("FetchManifest: %v", err)
@@ -152,7 +152,7 @@ func TestUnauthorizedClient(t *testing.T) {
 	demo := demobackend.New(upstreamToken)
 	demoSrv := httptest.NewServer(demo)
 	t.Cleanup(demoSrv.Close)
-	be := backend.NewClient(demoSrv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", upstreamToken, demoSrv.Client())
+	be := backend.NewClient(demoSrv.URL, "/v1/tools/openai.json", "/v1/tools/invoke", backend.Credential{Kind: "bearer", Token: upstreamToken}, demoSrv.Client())
 	tools, _ := be.FetchManifest(context.Background())
 	srv, _ := adapter.NewServer(tools, be, nil, "e2e")
 	h := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server { return srv },
