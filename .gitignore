@@ -1,0 +1,24 @@
+# 编译产物
+openaiot-mcp
+openaiot-mcp.exe
+dist/
+*.out
+
+# 内部文档（不进入发布包，遵循 cloud-api 同一纪律）
+*.internal.md
+
+# 本地配置（可能含凭据，绝不入库）
+configs/config.yaml
+*.local.yaml
+
+# 运行产物
+logs/
+*.log
+data/
+
+# 本地工具链
+.toolchain/
+
+# IDE
+.idea/
+.vscode/
